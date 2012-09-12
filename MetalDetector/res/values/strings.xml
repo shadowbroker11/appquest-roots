@@ -1,0 +1,9 @@
+<resources>
+
+    <string name="app_name">MetalDetector</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_metal_detector">Metal Detector</string>
+    <string name="on_screen_log_format" formatted="false">x: %d%%\ny:  %d%%\nz: %d%%</string>
+
+</resources>

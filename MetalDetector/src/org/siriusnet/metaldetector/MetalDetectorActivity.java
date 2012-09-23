@@ -9,12 +9,10 @@ import android.media.ToneGenerator;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
-import android.widget.TextView;
 
 public class MetalDetectorActivity extends Activity implements
 		MetalDetectorView {
 
-	private TextView onScreenLog;
 	private GraphView graphView;
 	private SensorManager sensorService;
 	private Sensor magneticFieldSensor;
@@ -25,8 +23,6 @@ public class MetalDetectorActivity extends Activity implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_metal_detector);
-
-		onScreenLog = (TextView) findViewById(R.id.on_screen_log);
 		graphView = (GraphView) findViewById(R.id.graph);
 
 		sensorService = (SensorManager) getSystemService(SENSOR_SERVICE);
@@ -81,7 +77,6 @@ public class MetalDetectorActivity extends Activity implements
 
 	private void generateTone(int value) {
 		generator.stopTone();
-		generator.startTone(ToneGenerator.TONE_CDMA_ABBR_INTERCEPT,
-				300);
+		generator.startTone(ToneGenerator.TONE_CDMA_ABBR_INTERCEPT, 300);
 	}
 }

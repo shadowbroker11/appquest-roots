@@ -10,7 +10,6 @@ import android.graphics.Paint;
 import android.graphics.Paint.Align;
 import android.graphics.Paint.Style;
 import android.graphics.Path;
-import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
@@ -28,12 +27,7 @@ public class GraphView extends View {
 	private int y;
 	private int[] valueBuffer;
 	private int valueBufferStartPosition;
-	private int defaultXWidth;
-	private int maxXWidth;
-	private int minXWidth;
 	private int xWidth;
-	private Color graphForeground;
-	private Color gridColor;
 	private Timer timer;
 	private Paint graphLinePaint;
 	private Paint graphSurfacePaint;
@@ -49,10 +43,7 @@ public class GraphView extends View {
 		y = 0;
 		valueBuffer = new int[VALUE_BUFFER_SIZE];
 		valueBufferStartPosition = 0;
-		defaultXWidth = 5;
-		maxXWidth = 10;
-		minXWidth = 1;
-		xWidth = defaultXWidth;
+		xWidth = 5;
 		timer = new Timer();
 		timer.scheduleAtFixedRate(timerTask, 0, UPDATE_PERIOD);
 		graphLinePaint = new Paint();
@@ -124,7 +115,7 @@ public class GraphView extends View {
 			int graphHeight, int yMarginTop) {
 		Path path = new Path();
 		Path surface = new Path();
-		path.moveTo(xMarginLeft, graphHeight + yMarginTop); //FIXME
+		path.moveTo(xMarginLeft, graphHeight + yMarginTop);
 		surface.moveTo(xMarginLeft, graphHeight + yMarginTop
 				+ halfOfStrokeWidthInPx);
 		for (int x = 0; graphWidth / xWidth + 1 > x; x++) {
@@ -149,12 +140,12 @@ public class GraphView extends View {
 		canvas.drawPath(path, graphLinePaint);
 	}
 
-	public Color getGraphForeground() {
-		return graphForeground;
+	public int getGraphForeground() {
+		return graphSurfacePaint.getColor();
 	}
 
-	public void setGraphForeground(Color graphForeground) {
-		this.graphForeground = graphForeground;
+	public void setGraphForeground(int graphForeground) {
+		graphSurfacePaint.setColor(graphForeground);
 	}
 
 	public int getGraphLine() {
@@ -165,12 +156,12 @@ public class GraphView extends View {
 		graphLinePaint.setColor(graphLine);
 	}
 
-	public Color getGridColor() {
-		return gridColor;
+	public int getGridColor() {
+		return gridPaint.getColor();
 	}
 
-	public void setGridColor(Color gridColor) {
-		this.gridColor = gridColor;
+	public void setGridColor(int gridColor) {
+		gridPaint.setColor(gridColor);
 	}
 
 	public void setYValue(int y) {
@@ -191,30 +182,6 @@ public class GraphView extends View {
 
 	public void setMaxY(int maxY) {
 		this.maxY = maxY;
-	}
-
-	public int getDefaultXWidth() {
-		return defaultXWidth;
-	}
-
-	public void setDefaultXWidth(int defaultXWidth) {
-		this.defaultXWidth = defaultXWidth;
-	}
-
-	public int getMaxXWidth() {
-		return maxXWidth;
-	}
-
-	public void setMaxXWidth(int maxXWidth) {
-		this.maxXWidth = maxXWidth;
-	}
-
-	public int getMinXWidth() {
-		return minXWidth;
-	}
-
-	public void setMinXWidth(int minXWidth) {
-		this.minXWidth = minXWidth;
 	}
 
 	public int getxWidth() {

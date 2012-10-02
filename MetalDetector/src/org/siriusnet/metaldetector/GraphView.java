@@ -83,7 +83,6 @@ public class GraphView extends View {
 		gridAxisLabels = new Paint();
 		gridAxisLabels.setColor(Color.BLACK);
 		gridAxisLabels.setTextSize(convertDpToPx(GRID_TEXT_SIZE));
-		gridAxisLabels.setTextAlign(Align.RIGHT);
 	}
 
 	@Override
@@ -106,6 +105,7 @@ public class GraphView extends View {
 		int y;
 		// draw the horizontal lines of the coordinate grid and the y axis
 		// labels
+		gridAxisLabels.setTextAlign(Align.RIGHT);
 		for (y = 0; y <= rows + 1; y++) {
 			gridPoints[y * 4] = xMarginLeft;
 			gridPoints[y * 4 + 1] = yMarginTop + y * rowHeight;
@@ -119,11 +119,19 @@ public class GraphView extends View {
 		}
 		int aOffset = (y - 1) * 4;
 		// draw the vertical lines of the coordinate grid and the x axis labels
+		gridAxisLabels.setTextAlign(Align.CENTER);
 		for (int x = 0; x <= cols; x++) {
 			gridPoints[aOffset + x * 4] = xMarginLeft + x * colWidth;
 			gridPoints[aOffset + x * 4 + 1] = yMarginTop;
 			gridPoints[aOffset + x * 4 + 2] = xMarginLeft + x * colWidth;
 			gridPoints[aOffset + x * 4 + 3] = yMarginTop + graphHeight;
+			if (x <= cols && x % 2 == 1) {
+				canvas.drawText(
+						(Math.round((double) (cols - x) * UPDATE_PERIOD / 100d) / 10d)
+								+ "s", x * colWidth + xMarginLeft, yMarginTop
+								+ graphHeight + convertDpToPx(GRID_TEXT_SIZE),
+						gridAxisLabels);
+			}
 		}
 
 		canvas.drawLines(gridPoints, gridPaint);

@@ -10,6 +10,8 @@ import android.graphics.Paint;
 import android.graphics.Paint.Align;
 import android.graphics.Paint.Style;
 import android.graphics.Path;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
@@ -213,5 +215,79 @@ public class GraphView extends View {
 	private int convertDpToPx(float dp) {
 		return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
 				getContext().getResources().getDisplayMetrics());
+	}
+
+	@Override
+	protected Parcelable onSaveInstanceState() {
+		Parcelable state = super.onSaveInstanceState();
+
+		SavedGraphViewState saveState = new SavedGraphViewState(state);
+
+		saveState.setValueBufferStartPosition(valueBufferStartPosition);
+		saveState.setValueBuffer(valueBuffer);
+
+		return saveState;
+	}
+
+	@Override
+	protected void onRestoreInstanceState(Parcelable state) {
+		if (state instanceof SavedGraphViewState) {
+			SavedGraphViewState saveState = (SavedGraphViewState) state;
+			super.onRestoreInstanceState(saveState.getSuperState());
+			valueBufferStartPosition = saveState.getValueBufferStartPosition();
+			valueBuffer = saveState.getValueBuffer();
+			
+		} else {
+			super.onRestoreInstanceState(state);
+		}
+	}
+
+	static final class SavedGraphViewState extends BaseSavedState {
+
+		private int[] valueBuffer;
+		private int valueBufferStartPosition;
+
+		public int[] getValueBuffer() {
+			return valueBuffer;
+		}
+
+		public void setValueBuffer(int[] valueBuffer) {
+			this.valueBuffer = valueBuffer;
+		}
+
+		public int getValueBufferStartPosition() {
+			return valueBufferStartPosition;
+		}
+
+		public void setValueBufferStartPosition(int valueBufferStartPosition) {
+			this.valueBufferStartPosition = valueBufferStartPosition;
+		}
+
+		public SavedGraphViewState(Parcelable parcelable) {
+			super(parcelable);
+		}
+
+		public SavedGraphViewState(Parcel in) {
+			super(in);
+			valueBufferStartPosition = in.readInt();
+			in.readIntArray(valueBuffer);
+		}
+
+		@Override
+		public void writeToParcel(Parcel dest, int flags) {
+			super.writeToParcel(dest, flags);
+			dest.writeInt(valueBufferStartPosition);
+			dest.writeIntArray(valueBuffer);
+		}
+
+		public static final Parcelable.Creator<SavedGraphViewState> CREATOR = new Parcelable.Creator<SavedGraphViewState>() {
+			public SavedGraphViewState createFromParcel(Parcel in) {
+				return new SavedGraphViewState(in);
+			}
+
+			public SavedGraphViewState[] newArray(int size) {
+				return new SavedGraphViewState[size];
+			}
+		};
 	}
 }

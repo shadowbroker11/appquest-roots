@@ -8,10 +8,12 @@ import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 
 public class MetalDetectorActivity extends Activity implements
 		MetalDetectorView {
 
+	private TextView geomagneticFieldValue;
 	private GraphView graphView;
 	private SensorManager sensorService;
 	private Sensor magneticFieldSensor;
@@ -22,7 +24,9 @@ public class MetalDetectorActivity extends Activity implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_metal_detector);
+
 		graphView = (GraphView) findViewById(R.id.graph);
+		geomagneticFieldValue = (TextView) findViewById(R.id.value);
 
 		sensorService = (SensorManager) getSystemService(SENSOR_SERVICE);
 		magneticFieldSensor = sensorService
@@ -65,10 +69,16 @@ public class MetalDetectorActivity extends Activity implements
 
 	@Override
 	public void setVectorValue(double strength) {
+		geomagneticFieldValue.setText(getString(
+				R.string.geomagnetic_field_value, strength));
 	}
 
 	private void generateTone(int value) {
-		generator.stopTone();
-		generator.startTone(ToneGenerator.TONE_CDMA_ABBR_INTERCEPT, 300);
+		try {
+			generator.stopTone();
+			generator.startTone(ToneGenerator.TONE_CDMA_ABBR_INTERCEPT, 300);
+		} catch (RuntimeException e) {
+			Log.d(MetalDetectorConstants.LOG_TAG, "failed to play tone", e);
+		}
 	}
 }

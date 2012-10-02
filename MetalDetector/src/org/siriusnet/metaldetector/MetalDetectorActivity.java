@@ -8,7 +8,6 @@ import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
 
 public class MetalDetectorActivity extends Activity implements
 		MetalDetectorView {
@@ -53,12 +52,6 @@ public class MetalDetectorActivity extends Activity implements
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.activity_metal_detector, menu);
-		return true;
-	}
-
-	@Override
 	public void setGeomagneticFieldStrength(int x, int y, int z) {
 		int val = (int) Math.sqrt(x * x + y * y + z * z);
 		if (val > 100) {
@@ -72,7 +65,6 @@ public class MetalDetectorActivity extends Activity implements
 
 	@Override
 	public void setVectorValue(double strength) {
-		// onScreenLog.setText("val: " + strength);
 	}
 
 	private void generateTone(int value) {

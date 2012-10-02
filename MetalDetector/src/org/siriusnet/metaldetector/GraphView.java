@@ -16,13 +16,18 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
 
+/**
+ * Draws a graph on the screen. The graph is periodically updated.
+ * 
+ * @author Cyrill Schenkel
+ */
 public class GraphView extends View {
 	private static final int VALUE_BUFFER_SIZE = 750;
 	private static final long UPDATE_PERIOD = 200;
 	private static final float GRAPH_STROKE_WIDTH = 2;
 	private static final float GRID_STROKE_WIDTH = 1;
 	private static final float GRID_TEXT_SIZE = 8;
-	private static final int GRAPH_PADDING = 15;
+	private static final int GRAPH_PADDING = 16;
 
 	private int minY;
 	private int maxY;
@@ -38,6 +43,11 @@ public class GraphView extends View {
 	private int halfOfStrokeWidthInPx;
 	private int graphPaddingInPx;
 
+	/**
+	 * Creates a new graph with default settings.
+	 * 
+	 * @see View#View(Context, AttributeSet)
+	 */
 	public GraphView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		minY = 0;
@@ -48,6 +58,7 @@ public class GraphView extends View {
 		xWidth = 5;
 		timer = new Timer();
 		timer.scheduleAtFixedRate(timerTask, 0, UPDATE_PERIOD);
+
 		graphLinePaint = new Paint();
 		graphLinePaint.setColor(context.getResources().getColor(
 				android.R.color.holo_blue_bright));
@@ -78,17 +89,23 @@ public class GraphView extends View {
 	@Override
 	public void draw(Canvas canvas) {
 		super.draw(canvas);
-		int graphWidth = canvas.getWidth() - 2 * graphPaddingInPx;
+		int graphWidth = canvas.getWidth() - 3 * graphPaddingInPx;
 		int xMarginLeft = graphPaddingInPx * 2;
-		int graphHeight = canvas.getHeight() - 2 * graphPaddingInPx;
-		int yMarginTop = convertDpToPx(GRID_TEXT_SIZE) / 2;
+		int graphHeight = canvas.getHeight() - 3 * graphPaddingInPx;
+		int yMarginTop = graphPaddingInPx;
 
 		int rows = 10;
 		int rowHeight = graphHeight / rows;
 		int colWidth = xWidth * 4;
 		int cols = graphWidth / colWidth;
+
+		graphWidth = cols * colWidth;
+		graphHeight = rows * rowHeight;
+
 		float[] gridPoints = new float[(rows + cols + 2) * 4];
 		int y;
+		// draw the horizontal lines of the coordinate grid and the y axis
+		// labels
 		for (y = 0; y <= rows + 1; y++) {
 			gridPoints[y * 4] = xMarginLeft;
 			gridPoints[y * 4 + 1] = yMarginTop + y * rowHeight;
@@ -101,6 +118,7 @@ public class GraphView extends View {
 			}
 		}
 		int aOffset = (y - 1) * 4;
+		// draw the vertical lines of the coordinate grid and the x axis labels
 		for (int x = 0; x <= cols; x++) {
 			gridPoints[aOffset + x * 4] = xMarginLeft + x * colWidth;
 			gridPoints[aOffset + x * 4 + 1] = yMarginTop;
@@ -113,11 +131,24 @@ public class GraphView extends View {
 		drawGraph(canvas, graphWidth, xMarginLeft, graphHeight, yMarginTop);
 	}
 
+	/**
+	 * Draw the graph without the grid.
+	 * 
+	 * @param canvas
+	 *            the canvas to draw the graph
+	 * @param graphWidth
+	 *            the width of the graph
+	 * @param xMarginLeft
+	 *            the left margin of the graph
+	 * @param graphHeight
+	 *            the height of the graph
+	 * @param yMarginTop
+	 *            the top margin of the graph
+	 */
 	private void drawGraph(Canvas canvas, int graphWidth, int xMarginLeft,
 			int graphHeight, int yMarginTop) {
 		Path path = new Path();
 		Path surface = new Path();
-		path.moveTo(xMarginLeft, graphHeight + yMarginTop);
 		surface.moveTo(xMarginLeft, graphHeight + yMarginTop
 				+ halfOfStrokeWidthInPx);
 		for (int x = 0; graphWidth / xWidth + 1 > x; x++) {
@@ -128,13 +159,14 @@ public class GraphView extends View {
 							+ valueBuffer.length - (graphWidth / xWidth + 1))
 							% valueBuffer.length]
 					* ((graphHeight + yMarginTop) / 100);
-			if (x + 1 < graphWidth / xWidth + 1) {
+			if (x == 0) {
+				path.moveTo(xPos, yPos);
+			} else if (x + 1 < graphWidth / xWidth + 1) {
 				path.lineTo(xPos, yPos);
-				surface.lineTo(xPos, yPos);
 			} else {
 				path.setLastPoint(xPos, yPos);
-				surface.lineTo(xPos, yPos);
 			}
+			surface.lineTo(xPos, yPos);
 		}
 		surface.lineTo(graphWidth + xMarginLeft, graphHeight + yMarginTop
 				+ halfOfStrokeWidthInPx);
@@ -146,6 +178,12 @@ public class GraphView extends View {
 		return graphSurfacePaint.getColor();
 	}
 
+	/**
+	 * Set the color of the filled surface of the graph.
+	 * 
+	 * @param graphForeground
+	 *            the surface color
+	 */
 	public void setGraphForeground(int graphForeground) {
 		graphSurfacePaint.setColor(graphForeground);
 	}
@@ -154,6 +192,12 @@ public class GraphView extends View {
 		return graphLinePaint.getColor();
 	}
 
+	/**
+	 * Set the line color of the graph.
+	 * 
+	 * @param graphLine
+	 *            the line color
+	 */
 	public void setGraphLine(int graphLine) {
 		graphLinePaint.setColor(graphLine);
 	}
@@ -162,10 +206,22 @@ public class GraphView extends View {
 		return gridPaint.getColor();
 	}
 
+	/**
+	 * Set the grid color.
+	 * 
+	 * @param gridColor
+	 *            the grid color
+	 */
 	public void setGridColor(int gridColor) {
 		gridPaint.setColor(gridColor);
 	}
 
+	/**
+	 * Set the y value to draw on the next iteration.
+	 * 
+	 * @param y
+	 *            the current y value
+	 */
 	public void setYValue(int y) {
 		this.y = y;
 	}
@@ -174,6 +230,12 @@ public class GraphView extends View {
 		return minY;
 	}
 
+	/**
+	 * The minimal displayable y value.
+	 * 
+	 * @param minY
+	 *            the minimal y value
+	 */
 	public void setMinY(int minY) {
 		this.minY = minY;
 	}
@@ -182,6 +244,12 @@ public class GraphView extends View {
 		return maxY;
 	}
 
+	/**
+	 * The maximal displayable y value.
+	 * 
+	 * @param maxY
+	 *            the maximal y value
+	 */
 	public void setMaxY(int maxY) {
 		this.maxY = maxY;
 	}
@@ -190,6 +258,12 @@ public class GraphView extends View {
 		return xWidth;
 	}
 
+	/**
+	 * The gap between two x values.
+	 * 
+	 * @param xWidth
+	 *            the gap between two x values
+	 */
 	public void setxWidth(int xWidth) {
 		this.xWidth = xWidth;
 	}
@@ -236,7 +310,6 @@ public class GraphView extends View {
 			super.onRestoreInstanceState(saveState.getSuperState());
 			valueBufferStartPosition = saveState.getValueBufferStartPosition();
 			valueBuffer = saveState.getValueBuffer();
-			
 		} else {
 			super.onRestoreInstanceState(state);
 		}
